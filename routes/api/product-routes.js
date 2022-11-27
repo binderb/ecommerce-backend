@@ -61,7 +61,8 @@ router.post('/', async (req, res) => {
     const newProduct = await Product.findByPk(product.id, {
       include: [{model : Category}, {model: Tag}]
     });
-    res.status(201).json(newProduct);
+    const message = "Note: refactored code returns full reference to new product.";
+    res.status(201).json({message:message,new_product:newProduct});
   } catch(err) {
     console.log(err);
     res.status(400).json(err);
@@ -72,11 +73,15 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     // update product data
-    await Product.update(req.body, {
+    const product_data = await Product.update(req.body, {
       where: {
         id: req.params.id,
       }
     });
+    if (product_data[0] === 0) {
+      res.status(404).json({message:'No product with the given ID was found!'});
+      return;
+    }
     // if the request body includes a tagIds field,
     // need to update the ProductTag model.
     if (req.body.tagIds) {
@@ -97,7 +102,6 @@ router.put('/:id', async (req, res) => {
           tag_id,
         };
       });
-      console.log(newProductTags);
       // figure out which ones to remove
       const productTagsToRemove = productTags
         .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
@@ -108,11 +112,12 @@ router.put('/:id', async (req, res) => {
         ProductTag.bulkCreate(newProductTags),
       ]);
     }
-    // get updated product and return it
+    // get updated product and return itv
     const updatedProduct = await Product.findByPk(req.params.id, {
       include: [{model: Category}, {model: Tag}]
     });
-    res.status(200).json(updatedProduct);
+    const message = "Note: refactored code returns full reference to updated product.";
+    res.status(200).json({message:message,updated_product:updatedProduct});
   } catch (err) {
     res.status(400).json(err);
   }

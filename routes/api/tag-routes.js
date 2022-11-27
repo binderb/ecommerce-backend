@@ -56,8 +56,12 @@ router.put('/:id', async (req, res) => {
         id: req.params.id
       }
     });
-    if (tag_data) {
-      res.status(200).json(tag_data);
+    if (tag_data[0] !== 0) {
+      const updated_tag = Tag.findByPk(req.params.id,{
+        include: [{model: Product}]
+      });
+      const message = 'Tag successfully updated.';
+      res.status(200).json({message:message,updated_tag:updated_tag});
     } else {
       res.status(404).json({message: 'No tag with the given ID was found!'});
     }

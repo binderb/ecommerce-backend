@@ -57,8 +57,11 @@ router.put('/:id', async (req, res) => {
       }
     });
     if (category_data[0] !== 0) {
-      
-      res.status(200).json(category_data);
+      const updated_category = await Category.findByPk(req.params.id,{
+        include: [{model: Product}]
+      });
+      const message = 'Category successfully updated.';
+      res.status(200).json({message:message,updated_category:updated_category});
     } else {
       res.status(404).json({message: 'No category with the given ID was found!'});
     }

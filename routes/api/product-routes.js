@@ -61,7 +61,7 @@ router.post('/', async (req, res) => {
     const newProduct = await Product.findByPk(product.id, {
       include: [{model : Category}, {model: Tag}]
     });
-    res.status(200).json(newProduct);
+    res.status(201).json(newProduct);
   } catch(err) {
     console.log(err);
     res.status(400).json(err);

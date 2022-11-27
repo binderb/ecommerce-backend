@@ -36,35 +36,36 @@ router.get('/:id', async (req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
-  /* req.body should look like this...
-    {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
-    }
-  */
-  Product.create(req.body)
-    .then((product) => {
-      // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
-          return {
-            product_id: product.id,
-            tag_id,
-          };
-        });
-        return ProductTag.bulkCreate(productTagIdArr);
+router.post('/', async (req, res) => {
+  try {
+    /* req.body should look like this...
+      {
+        product_name: "Basketball",
+        price: 200.00,
+        stock: 3,
+        tagIds: [1, 2, 3, 4]
       }
-      // if no product tags, just respond
-      res.status(200).json(product);
-    })
-    .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
+    */
+    const product = await Product.create(req.body);
+    // if there are product tags, we need to create pairings to bulk create in the ProductTag model
+    if (req.body.tagIds.length) {
+      const productTagIdArr = req.body.tagIds.map((tag_id) => {
+        return {
+          product_id: product.id,
+          tag_id,
+        };
+      });
+      await ProductTag.bulkCreate(productTagIdArr);
+    }
+    // get the newly-created product and return it
+    const newProduct = await Product.findByPk(product.id, {
+      include: [{model : Category}, {model: Tag}]
     });
+    res.status(200).json(newProduct);
+  } catch(err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 });
 
 // update product
@@ -77,7 +78,7 @@ router.put('/:id', async (req, res) => {
       }
     });
     // if the request body includes a tagIds field,
-    // need to update the product_tags join table.
+    // need to update the ProductTag model.
     if (req.body.tagIds) {
       // find all associated tags from ProductTag
       const productTags = await ProductTag.findAll({ 
@@ -112,7 +113,6 @@ router.put('/:id', async (req, res) => {
       include: [{model: Category}, {model: Tag}]
     });
     res.status(200).json(updatedProduct);
-    // res.status(200).json({message:'success'});
   } catch (err) {
     res.status(400).json(err);
   }

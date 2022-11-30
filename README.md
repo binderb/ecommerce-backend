@@ -41,13 +41,13 @@ npm run start
 to start the Express server. The following API endpoints are be available on the server once it's running:
 - Categories:
   - (GET all, POST) - <span style="font-family:monospace">/api/categories/</span>
-  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/categories/<span style="color:orange">id</span></span>
+  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/categories/(:id)</span>
 - Tags:
   - (GET all, POST) - <span style="font-family:monospace">/api/tags/</span>
-  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/tags/<span style="color:orange">id</span></span>
+  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/tags/(:id)</span>
 - Products:
   - (GET all, POST) - <span style="font-family:monospace">/api/products/</span>
-  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/products/<span style="color:orange">id</span></span>
+  - (GET one, PUT, DELETE) - <span style="font-family:monospace">/api/products/(:id)</span>
 
 
 ### Walkthrough
